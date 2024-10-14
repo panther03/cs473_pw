@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "fractal_fxpt.h": "c",
+        "fractal_myflpt.h": "c",
+        "random": "c"
+    }
+}
