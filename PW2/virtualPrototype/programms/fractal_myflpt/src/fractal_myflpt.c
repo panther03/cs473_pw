@@ -3,49 +3,39 @@
 #include <swap.h>
 #include <stdio.h>
 
+#include "cfg.h"
+
 //! \brief  Mandelbrot fractal point calculation function
 //! \param  cx    x-coordinate
 //! \param  cy    y-coordinate
 //! \param  n_max maximum number of iterations
 //! \return       number of performed iterations at coordinate (cx, cy)
-uint16_t calc_mandelbrot_point_soft(float cx, float cy, uint16_t n_max) {
-  myflp_t x = *((myflp_t*)&cx);
-  myflp_t y = *((myflp_t*)&cy);
+uint16_t calc_mandelbrot_point_soft(myflp_t cx, myflp_t cy, uint16_t n_max) {
   float two_f = 2.0;
-  myflp_t two = *((myflp_t*)&two_f);
+  float four_f = 4.0;
+  myflp_t two = FLOAT2MYFLP(two_f);
+  myflp_t four = FLOAT2MYFLP(four_f);
+
+  myflp_t x = cx;
+  myflp_t y = cy;
   uint16_t n = 0;
   myflp_t xx, yy, two_xy;
-  myflp_t xxyy;
   do {
     xx = fp_mul(x,x);
     yy = fp_mul(y,y);
-    two_xy = fp_mul(fp_mul(x,y),two);
+    myflp_t xy = fp_mul(x,y);
+#ifdef FRACTAL_2XOPT
+    two_xy = -(xy != 0) & (xy + (1 << MANT_BITS));
+#else 
+    two_xy = fp_mul(xy, two);
+#endif
 
-    x = fp_add(fp_sub(xx,yy),*((myflp_t*)&cx));
-    y = fp_add(two_xy,*((myflp_t*)&cy));
-    xxyy = fp_add(xx,yy);
+    x = fp_add(fp_sub(xx,yy),cx);
+    y = fp_add(two_xy,cy);
     ++n;
-  } while ((*((float*)&xxyy) < 4) && (n < n_max));
+  } while ((fp_sub(fp_add(xx,yy), four) & 0x80000000) && (n < n_max));
   return n;
 }
-
-uint16_t calc_mandelbrot_point_builtin(float cx, float cy, uint16_t n_max) {
-  float x = cx;
-  float y = cy;
-  uint16_t n = 0;
-  float xx, yy, two_xy;
-  do {
-    xx = x * x;
-    yy = y * y;
-    two_xy = 2 * x * y;
-
-    x = xx - yy + cx;
-    y = two_xy + cy;
-    ++n;
-  } while (((xx + yy) < 4) && (n < n_max));
-  return n;
-}
-
 
 //! \brief  Map number of performed iterations to black and white
 //! \param  iter  performed number of iterations
@@ -123,17 +113,19 @@ rgb565 iter_to_colour1(uint16_t iter, uint16_t n_max) {
 //! \param  n_max  maximum number of iterations
 void draw_fractal(rgb565 *fbuf, int width, int height,
                   calc_frac_point_p cfp_p, iter_to_colour_p i2c_p,
-                  float cx_0, float cy_0, float delta, uint16_t n_max) {
+                  myflp_t cx_0, myflp_t cy_0, myflp_t delta, uint16_t n_max) {
   rgb565 *pixel = fbuf;
-  float cy = cy_0;
+  myflp_t cy = cy_0;
   for (int k = 0; k < height; ++k) {
-    float cx = cx_0;
+    myflp_t cx = cx_0;
     for(int i = 0; i < width; ++i) {
       uint16_t n_iter = (*cfp_p)(cx,  cy, n_max);
       rgb565 colour = (*i2c_p)(n_iter, n_max);
       *(pixel++) = colour;
-      cx += delta;
+      float cxn = MYFLP2FLOAT(cx) + MYFLP2FLOAT(delta);
+      cx = FLOAT2MYFLP(cxn);
     }
-    cy += delta;
+    float cyn = MYFLP2FLOAT(cy) + MYFLP2FLOAT(delta);
+    cy = FLOAT2MYFLP(cyn);
   }
 }

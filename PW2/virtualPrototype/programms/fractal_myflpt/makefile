@@ -87,7 +87,11 @@ $(BUILD)/support/src/%.s.o : support/src/%.s
 	mkdir -p $(@D)
 	$(CC) $(_CFLAGS) $(CFLAGS) -c $< -o $@
 
-.PHONY : clean
+.PHONY : clean tb
 
 clean :
 	-rm -rf $(BUILD)/* crt0def.inc
+
+tb: 
+	@make -BC tb/
+	$(BUILD)/tb

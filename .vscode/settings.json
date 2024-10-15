@@ -2,6 +2,11 @@
     "files.associations": {
         "fractal_fxpt.h": "c",
         "fractal_myflpt.h": "c",
-        "random": "c"
+        "random": "c",
+        "myflpt.h": "c",
+        "swap.h": "c",
+        "defs.h": "c",
+        "stddef.h": "c",
+        "cfg.h": "c"
     }
 }
