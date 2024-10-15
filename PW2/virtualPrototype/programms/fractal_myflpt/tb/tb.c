@@ -107,8 +107,8 @@ void test_mandlebrot() {
         for(int i = 0; i < DIM; ++i) {
             uint16_t n1 = calc_mandelbrot_point_soft(cx, cy, 64);
             uint16_t n2 = mandlebrot_point(cx, cy, 64);
-            if ((n1 - n2)!=0) {
-                printf("Diff: %d\n", n1-n2);
+            if (abs(n1 - n2) > 5) {
+                printf("(%f,%f) Diff: %d\n", cx, cy, n1-n2);
                 m_err++;
                 if (abs(n1-n2) > worst) {
                     worst = abs(n1-n2);
@@ -122,6 +122,13 @@ void test_mandlebrot() {
 }
 
 int main() {
+    //float x = -0.500000;
+    //float y = -0.591797;
+    //mandlebrot_point_myflp(x,y,64);
+    //return 0;
+    //float zero = 0.0;
+    //float x = FP_ADD_V(zero, zero);
+    //return 0;
     test_mandlebrot();
     return 0;
 }

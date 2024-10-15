@@ -23,7 +23,7 @@ int main() {
    int i;
    vga_clear();
    printf("Starting drawing a fractal\n");
-#ifdef OR1300   
+#ifndef OR1300   
    /* enable the caches */
    icache_write_cfg( CACHE_DIRECT_MAPPED | CACHE_SIZE_8K | CACHE_REPLACE_FIFO );
    dcache_write_cfg( CACHE_FOUR_WAY | CACHE_SIZE_8K | CACHE_REPLACE_LRU | CACHE_WRITE_BACK );
