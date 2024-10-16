@@ -1,13 +1,13 @@
 #include <fractal_conv.h>
 
 // Implement a basic Q7.25 (32bit) Fixed Point Operator
-// Here, scaling factor (S) = 2^28
+// Here, scaling factor (S) = 2^25
 // Inspiration: https://en.wikipedia.org/wiki/Fixed-point_arithmetic#Binary_fixed-point_multiplication
 
 // Float to FXP
 fxp32_t floatToFXP(float in) {
-  float out = in * 0x2000000; // Same as * 2^27
-  return (fxp32_t)(out); // Casting rounds down + adding 0.5 results in correct rounding
+  float out = in * 0x2000000; // Same as * 2^25
+  return (fxp32_t)(out); 
 }
 // (unsigned) int to FXP
 fxp32_t intToFXP(int in) {
