@@ -101,20 +101,22 @@ Here, we remove the lowest 13 bits, which loses some precision. However, 12 bits
 
 Running the program, a major improvement in speed is seen. With caches enabled, the floating-point implementation takes about 85 seconds. For the 64-bit multiplication version, it takes about 15 seconds. For the 32-bit multiplication version, it takes just about 5.64 seconds.
 
-There is little loss of detail in the image, as shown in the figure below.
+Without cache, it takes about 426 seconds for the 64-bit multiplication and about 166 seconds for the 32-bit multiplication. As mentioned during the lectures, floating point without cache takes more than 15 minutes. 
+
+There is little loss of detail in the image between the different implementations, as shown in the figure below.
 
 <div style="display: flex; justify-content: space-around;">
   <figure>
     <img src="imgs/fxp_32bit_mult_w_cache.png" alt="Image A" style="width: auto;">
-    <figcaption>FXP 32-bit multiplication</figcaption>
+    <figcaption style="font-style:italic;">Fig. 1: FXP 32-bit multiplication</figcaption>
   </figure>
   <figure>
     <img src="imgs/fxp_64bit_mult_w_cache.png" alt="Image B" style="width: auto;">
-    <figcaption>FXP 64-bit multiplication</figcaption>
+    <figcaption style="font-style:italic;">Fig. 2: FXP 64-bit multiplication</figcaption>
   </figure>
   <figure>
-    <img src="imgs/fxp_32bit_mult_w_cache.png" alt="Image C" style="width: auto;">
-    <figcaption>FLP version</figcaption>
+    <img src="imgs/flp_w_cache.png" alt="Image C" style="width: auto;">
+    <figcaption style="font-style:italic;">Fig. 3: FLP version</figcaption>
   </figure>
 </div>
 
