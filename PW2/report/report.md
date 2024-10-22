@@ -1,5 +1,25 @@
+---
+title: "CS476 - PW2 Report"
+author: Julien de Castelnau, Magnus Meyer
+date: October 22, 2024
+geometry: "a4paper, left=2cm,right=2cm,top=2cm,bottom=3cm"
+output: pdf_document
+---
+
+
 # Code organization 
 
+```
+PW2/
+|  programs/
+   |  fractal_myflpt/ - Floating point implementation
+      |  src/ - flpt + mandlebrot implementation
+      |  include/
+         |  myflpt.h - interface to FP library
+         |  cfg.h - configuration options: toggle various optimizations
+      |  tb/ - FP testbench (discussed later)
+   |  fractal_fxpt/ - Fixed point implementation
+```
 
 # Fixed Point Integers
 
@@ -65,7 +85,9 @@ fxp32_t CX_0_FXP = floatToFXP(CX_0);
 fxp32_t CY_0_FXP = floatToFXP(CY_0);
 fxp32_t DELTA_0_FXP = floatToFXP(delta);
 
-draw_fractal(frameBuffer, SCREEN_WIDTH, SCREEN_HEIGHT, &calc_mandelbrot_point_soft, &iter_to_colour, CX_0_FXP, CY_0_FXP, DELTA_0_FXP, N_MAX);
+draw_fractal(frameBuffer, SCREEN_WIDTH, SCREEN_HEIGHT,
+  &calc_mandelbrot_point_soft, &iter_to_colour, 
+  CX_0_FXP, CY_0_FXP, DELTA_0_FXP, N_MAX);
 ```
 
 ## Handling Overflow
@@ -108,20 +130,23 @@ Without cache, it takes about 426 seconds for the 64-bit multiplication and abou
 
 There is little loss of detail in the image between the different implementations, as shown in the figure below.
 
-<div style="display: flex; justify-content: space-around;">
-  <figure>
-    <img src="imgs/fxp_32bit_mult_w_cache.png" alt="Image A" style="width: auto;">
-    <figcaption style="font-style:italic;">Fig. 1: FXP 32-bit multiplication</figcaption>
-  </figure>
-  <figure>
-    <img src="imgs/fxp_64bit_mult_w_cache.png" alt="Image B" style="width: auto;">
-    <figcaption style="font-style:italic;">Fig. 2: FXP 64-bit multiplication</figcaption>
-  </figure>
-  <figure>
-    <img src="imgs/flp_w_cache.png" alt="Image C" style="width: auto;">
-    <figcaption style="font-style:italic;">Fig. 3: FLP version</figcaption>
-  </figure>
-</div>
+```{=latex}
+\begin{minipage}{0.33\textwidth}
+  \centering
+  \includegraphics[width=0.9\textwidth,keepaspectratio]{imgs/flp_w_cache.png}\\
+  Fig 1: FLP version
+\end{minipage}%
+\begin{minipage}{0.33\textwidth}
+  \centering
+  \includegraphics[width=0.9\textwidth,keepaspectratio]{imgs/fxp_64bit_mult_w_cache.png}\\
+  Fig. 2: FXP 64-bit multiplication
+\end{minipage}%
+\begin{minipage}{0.33\textwidth}
+  \centering
+  \includegraphics[width=0.9\textwidth,keepaspectratio]{imgs/fxp_32bit_mult_w_cache.png}\\
+  Fig. 3: FXP 32-bit multiplication
+\end{minipage}
+```
 
 Based on this, we believe the 32-bit multiplication fixed-point version is the best, as it achieved an almost identical Mandelbrot while only taking about 5.6 seconds to complete.
 
@@ -129,11 +154,11 @@ Based on this, we believe the 32-bit multiplication fixed-point version is the b
 
 ## Format
 
-We used a 32-bit single precision float format, following the IEEE 754 spec, in our implementation:
+We use the format given in the assignment, i.e. IEEE 754 with the mantissa and exponent flipped:
 
-![](imgs/ieee754.png)
+![](imgs/format.png)
 
-Following the same format makes it easy to reuse float literals provided in C without having to convert.
+Using the same fields as IEEE 754 makes it easy to convert between float literals provided in C. Also, it enables easy verification of the operator implementations (since the hex can be compared directly). Since the underlying operations are on either 32-bit or 64-bit integers, the sizes don't make a big difference for performance. Thus, we also stick with the sizes given by IEEE 754 so we can achieve the same accuracy.
 
 ## Implementation
 
@@ -179,14 +204,14 @@ We employ an additional optimization in the mandlebrot code itself - the express
 
 ```c
 #ifdef FRACTAL_2XOPT
-    two_xy = -(xy != 0) & (xy + (1 << MANT_BITS));
+    two_xy = -(xy != 0) & (xy + 1);
 #else 
     // two is a constant defined to 2.0, converted to the myflp_t type
     two_xy = fp_mul(xy, two);
 #endif
 ```
 
-Finally, for modularity, we've refactored the renormalization loop, handling shifting of the mantissa into the correct place and adjusting the exponent accordingly, into its own function:
+Finally, for modularity, we've extracted the renormalization loop, which handles shifting of the mantissa into the correct place and adjustment of the exponent accordingly, into its own function:
 
 ```c
 static inline void renormalize(uint32_t *mant_res, uint32_t *exp);
@@ -219,24 +244,29 @@ Total error pixels: 408 (out of 262144) (worst 39)
 
 First we will compare the accuracy of the image with the various optimizations proposed.
 
-<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-  <figure>
-    <img src="imgs/flp_w_cache.png" alt="Image A" style="width: 100%; height: 200px; object-fit: cover;">
-    <figcaption style="font-style: italic;">Fig. 4: Reference FLP</figcaption>
-  </figure>
-  <figure>
-    <img src="imgs/myflp_64bit_mult_w_cache_no_x2.png" alt="Image B" style="width: 100%; height: 200px; object-fit: cover;">
-    <figcaption style="font-style: italic;">Fig. 5: Our FLP (64-bit mult)</figcaption>
-  </figure>
-  <figure>
-    <img src="imgs/myflp_32bit_mult_w_cache_no_x2.png" alt="Image C" style="width: 100%; height: 200px; object-fit: cover;">
-    <figcaption style="font-style: italic;">Fig. 6: Our FLP (32-bit mult)</figcaption>
-  </figure>
-  <figure>
-    <img src="imgs/myflp_32bit_mult_w_cache_x2.png" alt="Image D" style="width: 100%; height: 200px; object-fit: cover;">
-    <figcaption style="font-style: italic;">Fig. 7: Our FLP (32-bit mult; faster multiply by 2)</figcaption>
-  </figure>
-</div>
+```{=latex}
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \includegraphics[width=0.9\textwidth,keepaspectratio]{imgs/flp_w_cache.png}\\
+  Fig 4: Reference FLP
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \includegraphics[width=0.9\textwidth,keepaspectratio]{imgs/myflp_64bit_mult_w_cache_no_x2.png}\\
+  Fig. 5: Our FLP (64-bit mult)
+\end{minipage}
+
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \includegraphics[width=0.9\textwidth,keepaspectratio]{imgs/myflp_32bit_mult_w_cache_no_x2.png}\\
+  Fig. 6: Our FLP (32-bit mult)
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+  \centering
+  \includegraphics[width=0.9\textwidth,keepaspectratio]{imgs/myflp_32bit_mult_w_cache_x2.png}\\
+  Fig. 7: Our FLP (32-bit mult; faster mult by 2)
+\end{minipage}
+```
 
 The differences are minimal between the various versions. The 32-bit has some minor artifacts which can be noticed, such as a bright green pixel in the dark green area towards the center at the bottom.
 
@@ -246,6 +276,6 @@ We measured all performance figures with caches enabled.
 
 | Reference FLP | Our FLP (64-bit mult) | Our FLP (32-bit mult) | Our FLP (32-bit mult; faster multiply by 2) |
 | ------------- | --------------------- | --------------------- | ------------------------------------------- |
-| 1m15s         | 1m20s                 | 47s                   | 42s                                         |
+| 1m15s         | 58s                   | 47s                   | 42s                                         |
 
-As the table shows, we lose out to the reference implementation using the same size multiplication as them, but save a lot of time while sacrificing minimal image quality switching to 32-bit, and even more by using the efficient multiplication by 2 method.
+As the table shows, all implementations beat the reference implementation, while sacrificing minimal to no image quality. 32-bit multiplication and our efficient power of 2 multiplication method save further time.

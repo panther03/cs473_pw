@@ -9,28 +9,28 @@
 
 int err_cnt = 0;
 
-float fp_verif(float x, float y, float exp, uint32_t act, char op) {
+float fp_verif(float x, float y, float exp, float act, char op) {
     uint32_t exp_d = *((uint32_t*)&exp);
     uint32_t x_d = *((uint32_t*)&x);
     uint32_t y_d = *((uint32_t*)&y);
-    float act_f = *((float*)&act);
-    double err = (double)(act_f) - (double)(exp);
+    uint32_t act_d = *((uint32_t*)&act);
+    double err = (double)(act) - (double)(exp);
     err = err / ((double)(exp)) * 100.0;
-    if (exp_d != act) {
+    if (exp_d != act_d) {
         err_cnt++;
 #ifndef MUTE
           printf("Disagree: %f %c %f = %f, expected %f (%f%% err)\n"
-                "     Hex: %08x %c %08x = %08x, expected %08x\n\n", x, op, y, act_f, exp, err, x_d, op, y_d, act, exp_d);
+                "     Hex: %08x %c %08x = %08x, expected %08x\n\n", x, op, y, act, exp, err, x_d, op, y_d, act_d, exp_d);
           if (err_cnt > PANIC_THRESHOLD) exit(1);
 #endif
     }
-    return act_f;
+    return act;
 }
 
-#define FP_DIV_V(x,y) fp_verif(x,y,x/y, fp_div(FLOAT2MYFLP(x),FLOAT2MYFLP(y)), '/');
-#define FP_MUL_V(x,y) fp_verif(x,y,x*y, fp_mul(FLOAT2MYFLP(x),FLOAT2MYFLP(y)), '*');
-#define FP_SUB_V(x,y) fp_verif(x,y,x-y, fp_sub(FLOAT2MYFLP(x),FLOAT2MYFLP(y)), '-');
-#define FP_ADD_V(x,y) fp_verif(x,y,x+y, fp_add(FLOAT2MYFLP(x),FLOAT2MYFLP(y)), '+');
+#define FP_DIV_V(x,y) fp_verif(x,y,x/y, myflp2float(fp_div(float2myflp(x),float2myflp(y))), '/');
+#define FP_MUL_V(x,y) fp_verif(x,y,x*y, myflp2float(fp_mul(float2myflp(x),float2myflp(y))), '*');
+#define FP_SUB_V(x,y) fp_verif(x,y,x-y, myflp2float(fp_sub(float2myflp(x),float2myflp(y))), '-');
+#define FP_ADD_V(x,y) fp_verif(x,y,x+y, myflp2float(fp_add(float2myflp(x),float2myflp(y))), '+');
 
 uint16_t myflp_mandlebrot_test(float cx, float cy, uint16_t n_max) {
   uint16_t n = 0;
@@ -86,9 +86,9 @@ void test_mandlebrot() {
     for (int k = 0; k < DIM; ++k) {
         float cx = cx_0;
         for(int i = 0; i < DIM; ++i) {
-            uint16_t n1 = calc_mandelbrot_point_soft(FLOAT2MYFLP(cx), FLOAT2MYFLP(cy), 64);
+            uint16_t n1 = calc_mandelbrot_point_soft(float2myflp(cx), float2myflp(cy), 64);
             uint16_t n2 = mandlebrot_point_ref(cx, cy, 64);
-            if (abs(n1 - n2) > 2) {
+            if (abs(n1 - n2) > 0) {
                 printf("(%f,%f) Diff: %d\n", cx, cy, n1-n2);
                 m_err++;
                 if (abs(n1-n2) > worst) {
@@ -119,9 +119,9 @@ int main() {
     int c = 512;
     myflp_t cf = int2myflp(c);
     float expected = (float)c;
-    myflp_t expected_d = FLOAT2MYFLP(expected);
+    myflp_t expected_d = float2myflp(expected);
     if (cf != expected_d) {
-      float cf_f = MYFLP2FLOAT(cf);
+      float cf_f = myflp2float(cf);
       printf("Disagree: convert %d => %f, expected %f \n"
              "     Hex: convert %d => %08x, expected %08x\n\n",
             c,cf_f,expected,c,cf,expected_d);
