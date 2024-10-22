@@ -4,8 +4,12 @@
 #include <stdint.h>
 
 #define MANT_BITS 23
+#define MANT_MASK ((1<<MANT_BITS)-1)
+
 #define EXP_BITS (32 - 1 - MANT_BITS)
-#define EXP_OFFSET ((1 << EXP_BITS - 1))
+#define EXP_MASK ((1 << EXP_BITS)-1)
+#define EXP_OFFSET ((1 << (EXP_BITS-1))-1)
+#define TO_EXP_FIELD(x) ((x) << MANT_BITS)
 
 #define INFINITY (((1 << EXP_BITS)-1) << MANT_BITS)
 

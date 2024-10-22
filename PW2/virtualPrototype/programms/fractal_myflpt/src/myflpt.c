@@ -15,7 +15,7 @@
 static inline void renormalize(uint32_t *mant_res, uint32_t *exp) {
     // Overflow case
     if (*mant_res >> (MANT_BITS+1)) {
-        *exp += (1 << MANT_BITS);
+        *exp += TO_EXP_FIELD(1);
         *mant_res >>= 1;
         FP_DBG_PRINT("(Corrected Overflow) S = %x\n", *mant_res);
     } else {
@@ -23,14 +23,14 @@ static inline void renormalize(uint32_t *mant_res, uint32_t *exp) {
         // Should always terminate because:
         // either the whole mantissa was 0, in which case we returned before
         // or there is a 1 at or after bit 22
-        // can't be one before because we truncated
+        // can't be one before because we truncated (assumed precondition)
         while ((*mant_res & (1 << (MANT_BITS))) == 0) {
-            *exp -= (1 << MANT_BITS);
+            *exp -= TO_EXP_FIELD(1);
             *mant_res <<= 1;
         }
     }
     
-    *mant_res = *mant_res & ((1 << MANT_BITS)-1);
+    *mant_res = *mant_res & MANT_MASK;
 }
 
 myflp_t int2myflp(int32_t x) {
@@ -40,27 +40,27 @@ myflp_t int2myflp(int32_t x) {
     if (sign) {
         x = -x;
     }
-    // replace magic number 127
-    int exp = 127 + 30;
+    // 30 => what exponent offset should be
+    // if the mantissa is at bit 30
+    int exp = EXP_OFFSET + 30;
     while ((x & 0x40000000) == 0) {
         x <<= 1;
         exp -= 1;
     }
-    // todo replace magic number 7
-    uint32_t mant = (((uint32_t)x) >> 7) & ((1 << MANT_BITS)-1);
+    uint32_t mant = (((uint32_t)x) >> (30 - MANT_BITS)) & MANT_MASK;
 
-    return sign | (exp << MANT_BITS) | mant;
+    return sign | TO_EXP_FIELD(exp) | mant;
 }
 
 myflp_t fp_add(myflp_t a, myflp_t b) {
     // Form mantissas
     const uint32_t mant_ghost = (1 << MANT_BITS);
-    int32_t mant_a = mant_ghost | (a & ((1<<MANT_BITS)-1));
-    int32_t mant_b = mant_ghost | (b & ((1<<MANT_BITS)-1));
+    int32_t mant_a = mant_ghost | (a & MANT_MASK);
+    int32_t mant_b = mant_ghost | (b & MANT_MASK);
     FP_DBG_PRINT("(Start Mantissas) A: %x | B: %x\n", mant_a, mant_b);
     // Extract exponents 
-    uint32_t exp_a = a & (((1<<EXP_BITS)-1)<<MANT_BITS);
-    uint32_t exp_b = b & (((1<<EXP_BITS)-1)<<MANT_BITS);
+    uint32_t exp_a = a & TO_EXP_FIELD(EXP_MASK);
+    uint32_t exp_b = b & TO_EXP_FIELD(EXP_MASK);
     FP_DBG_PRINT("(Exponents) A: %x | B: %x\n", exp_a, exp_b);
 
     // Pick larger exponent and de-normalize mantissa to larger exponent
@@ -118,8 +118,8 @@ myflp_t fp_mul(myflp_t a, myflp_t b) {
     if (a == 0 || b == 0) { return 0; }
     // Form mantissas
     const uint32_t mant_ghost = (1 << MANT_BITS);
-    int32_t mant_a = mant_ghost | (a & ((1<<MANT_BITS)-1));
-    int32_t mant_b = mant_ghost | (b & ((1<<MANT_BITS)-1));
+    int32_t mant_a = mant_ghost | (a & MANT_MASK);
+    int32_t mant_b = mant_ghost | (b & MANT_MASK);
     FP_DBG_PRINT("(Start Mantissas) A: %x | B: %x\n", mant_a, mant_b);
 
     // Grab sign of A,B and adjust mantissas accordingly
@@ -132,13 +132,12 @@ myflp_t fp_mul(myflp_t a, myflp_t b) {
     FP_DBG_PRINT("(Signed Mantissas) A: %x | B: %x\n", mant_a, mant_b);
 
     // Extract exponents 
-    uint32_t exp_a = a & (((1<<EXP_BITS)-1)<<MANT_BITS);
-    uint32_t exp_b = b & (((1<<EXP_BITS)-1)<<MANT_BITS);
+    uint32_t exp_a = a & TO_EXP_FIELD(EXP_MASK);
+    uint32_t exp_b = b & TO_EXP_FIELD(EXP_MASK);
     FP_DBG_PRINT("(Exponents) A: %x | B: %x\n", exp_a, exp_b);
 
     // Resulting exponent is sum, accounting for the default offset
-    const int exp_offset = ((1<<(EXP_BITS-1))-1);
-    int32_t exp = exp_a + exp_b - (exp_offset << MANT_BITS);
+    int32_t exp = exp_a + exp_b - TO_EXP_FIELD(EXP_OFFSET);
     FP_DBG_PRINT("(Exponent Sum) S: %x\n", exp);
 
     // Multiply mantissas    
@@ -183,8 +182,8 @@ myflp_t fp_div(myflp_t a, myflp_t b) {
     if (b == 0) { return INFINITY; }
     // Form mantissas
     const uint32_t mant_ghost = (1 << MANT_BITS);
-    int32_t mant_a = mant_ghost | (a & ((1<<MANT_BITS)-1));
-    int32_t mant_b = mant_ghost | (b & ((1<<MANT_BITS)-1));
+    int32_t mant_a = mant_ghost | (a & MANT_MASK);
+    int32_t mant_b = mant_ghost | (b & MANT_MASK);
     FP_DBG_PRINT("(Start Mantissas) A: %x | B: %x\n", mant_a, mant_b);
 
     // Grab sign of A,B and adjust mantissas accordingly
@@ -197,19 +196,18 @@ myflp_t fp_div(myflp_t a, myflp_t b) {
     FP_DBG_PRINT("(Signed Mantissas) A: %x | B: %x\n", mant_a, mant_b);
 
     // Extract exponents 
-    uint32_t exp_a = a & (((1<<EXP_BITS)-1)<<MANT_BITS);
-    uint32_t exp_b = b & (((1<<EXP_BITS)-1)<<MANT_BITS);
+    uint32_t exp_a = a & TO_EXP_FIELD(EXP_MASK);
+    uint32_t exp_b = b & TO_EXP_FIELD(EXP_MASK);
     FP_DBG_PRINT("(Exponents) A: %x | B: %x\n", exp_a, exp_b);
 
     // Resulting exponent is diff, accounting for the default offset
-    const int exp_offset = ((1<<(EXP_BITS-1))-1);
-    int32_t exp = exp_a - exp_b + (exp_offset << MANT_BITS);
+    int32_t exp = exp_a - exp_b + TO_EXP_FIELD(EXP_OFFSET);
     FP_DBG_PRINT("(Exponent Diff) S: %x\n", exp);
 
     // Divide mantissas    
     int64_t mant_res_temp  = (((int64_t)(mant_a)) << MANT_BITS) / (int64_t)(mant_b);
     uint32_t mant_res = (uint32_t)mant_res_temp;
-    FP_DBG_PRINT("(Raw Result) P = %x\n", mant_res);
+    FP_DBG_PRINT("(Raw Result) Q = %x\n", mant_res);
     
     // Convert to unsigned, store result in sign bit
     uint32_t sign_res = mant_res & 0x80000000;
