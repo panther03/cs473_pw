@@ -1,7 +1,7 @@
 ---
 title: "CS476 - PW2 Report"
-author: Julien de Castelnau, Magnus Meyer
-date: October 22, 2024
+author: Julien de Castelnau (368509), Magnus Meyer (396302)
+date: October 23, 2024
 geometry: "a4paper, left=2cm,right=2cm,top=2cm,bottom=3cm"
 output: pdf_document
 ---
@@ -19,6 +19,9 @@ PW2/
          |  cfg.h - configuration options: toggle various optimizations
       |  tb/ - FP testbench (discussed later)
    |  fractal_fxpt/ - Fixed point implementation
+      | src/ - fxp + mandelbrot implementation
+      | include/
+          | fractal_conv.h - interface to FXP library
 ```
 
 # Fixed Point Integers
