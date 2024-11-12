@@ -11,7 +11,7 @@ output: pdf_document
 
 1. As explained in the [referenced article](http://www.catb.org/esr/structure-packing/), alignment requirements can produce "unneccesary" padding, that is required to ensure that memory accesses are aligned. As an example, integers (4 bytes) must start on an address divisible by 4 (2 right-most bits 0), while long (8 bytes) needs to be on addresses divisible by 8, while chars can be on any address.
 
-As described, this forces the compiler to introduce "padding", in order to make sure that the next address is aligned with its type. The "__packed" attribute specifies that fields within the struct should be as compact as possible. [Source](https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Packed-Structures.html). 
+    As described, this forces the compiler to introduce "padding", in order to make sure that the next address is aligned with its type. The "__packed" attribute specifies that fields within the struct should be as compact as possible. [Source](https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Packed-Structures.html). 
 
 2. 
 - The ordering of the fields within the struct is fixed in all cases: 4 byte `id` followed directly by `data`, however long it is, plus padding at the end depending on `PARAM_DATALEN`
@@ -34,7 +34,7 @@ As described, this forces the compiler to introduce "padding", in order to make 
 # Task 3
 11. Row-major and column-major refers to the ordering of a 2D array in memory. In row-major, the row given by the first index (using C double brackets e.g. `A[][]` syntax) is contiguous in memory. In column-major the column given by the second index is contiguous. C uses row-major.
 12. Primarily the accesses to out_vector and matrix. Because matrix is row-major each inner iteration loads a different cache line (size of row is 256 elements or 1024 bytes). `out_vector` may be similarly evicted frequently because the entire 1KiB of vector is stored to on every outer loop iteration.
-13. Reorder the loops so that `i` is on the outside and `j` inside. This switches things so that `in_vector` is now evicted frequently instead of `out_vector`, but `matrix` is accessed in a cache-friendlier order, so the overall 65893 to 8257.
+13. Reorder the loops so that `i` is on the outside and `j` inside. This switches things so that `in_vector` is now evicted frequently instead of `out_vector`, but `matrix` is accessed in a cache-friendlier order, so the overall misses are reduced from 65893 to 8257.
 
 # Task 4
 14. It does not work because the writes to the LEDS are being cached. Normally, the I/O should be in an uncached region of memory but this is not the case here.
@@ -44,8 +44,8 @@ As described, this forces the compiler to introduce "padding", in order to make 
 
 * Disable write-back policy in `init_dcache()` and use write-through instead (remove `CACHE_WRITE_BACK` flag): 
 
-```c
-dcache_write_cfg (CACHE_FOUR_WAY | CACHE_SIZE_4K | CACHE_REPLACE_LRU);
-```
+    ```c
+    dcache_write_cfg (CACHE_FOUR_WAY | CACHE_SIZE_4K | CACHE_REPLACE_LRU);
+    ```
 
-This works because write-through means that the access is cached, but it is propagated to the system memory anyway.
+    This works because write-through means that the access is cached, but it is propagated to the system memory anyway.
