@@ -21,7 +21,7 @@
 void init_dcache() {
     // YOU CAN MODIFY THIS.
     dcache_enable(0);
-    dcache_write_cfg(CACHE_FOUR_WAY | CACHE_SIZE_4K | CACHE_REPLACE_LRU);
+    dcache_write_cfg(CACHE_FOUR_WAY | CACHE_SIZE_4K | CACHE_REPLACE_LRU | CACHE_WRITE_BACK);
     dcache_enable(1);
 }
 
@@ -42,6 +42,7 @@ void init_leds() {
 
 void bouncing_ball() {
     // YOU CAN MODIFY THIS.
+    // dcache_enable(0);
     int xdir, ydir, xpos, ypos, index;
     volatile unsigned int* leds = (unsigned int*)(LEDS_NEW_BASE + LEDS_LEDS_OFFSET);
 
@@ -50,7 +51,7 @@ void bouncing_ball() {
     while (1) {
         index = ypos * 12 + xpos;
         leds[index] = 0;
-        if (ypos == 9)
+        if (ypos == 8)
             ydir = -1;
         if (ypos == 0)
             ydir = 1;
@@ -62,6 +63,7 @@ void bouncing_ball() {
         xpos += xdir;
         index = ypos * 12 + xpos;
         leds[index] = swap_u32(2);
+        dcache_flush(); // Perform flush
         for (volatile long i = 0; i < 100000; i++)
             ;
     }

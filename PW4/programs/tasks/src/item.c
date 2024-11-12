@@ -62,9 +62,8 @@ item_t* items_find(item_t* items, size_t log2n, unsigned id) {
 void item_init(item_t* item, uint32_t id, const char* data) {
     // YOU CAN MODIFY THIS.
     item->id = id;
-
+    item->data = alloc(ITEM_DATALEN*sizeof(char));
+    
     if (data != NULL)
         memcpy(item->data, data, ITEM_DATALEN);
-    else
-        memset(item->data, 0, ITEM_DATALEN);
 }

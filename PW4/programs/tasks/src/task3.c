@@ -51,7 +51,7 @@ static void multiply() {
 
     for (int j = 0; j < MATRIX_N; ++j) {
         for (int i = 0; i < MATRIX_N; ++i) {
-            out_vector[i] += matrix[i][j] * in_vector[j];
+            out_vector[i] += matrix[j][i] * in_vector[j];
         }
     }
 }
