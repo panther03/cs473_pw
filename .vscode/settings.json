@@ -7,6 +7,7 @@
         "swap.h": "c",
         "defs.h": "c",
         "stddef.h": "c",
-        "cfg.h": "c"
+        "cfg.h": "c",
+        "task2.h": "c"
     }
 }

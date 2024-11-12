@@ -9,7 +9,10 @@ output: pdf_document
 
 # Exercises
 
-1. `__packed` tells the compiler to ignore internal alignment requirements and the alignment of the struct itself. 
+1. As explained in the [referenced article](http://www.catb.org/esr/structure-packing/), alignment requirements can produce "unneccesary" padding, that is required to ensure that memory accesses are aligned. As an example, integers (4 bytes) must start on an address divisible by 4 (2 right-most bits 0), while long (8 bytes) needs to be on addresses divisible by 8, while chars can be on any address.
+
+As described, this forces the compiler to introduce "padding", in order to make sure that the next address is aligned with its type. The "__packed" attribute specifies that fields within the struct should be as compact as possible. [Source](https://www.gnu.org/software/c-intro-and-ref/manual/html_node/Packed-Structures.html). 
+
 2. 
 - The ordering of the fields within the struct is fixed in all cases: 4 byte `id` followed directly by `data`, however long it is, plus padding at the end depending on `PARAM_DATALEN`
 - `id` is always 4 bytes, while data is `PARAM_DATALEN` bytes long.
@@ -22,26 +25,22 @@ output: pdf_document
 
 7. The accesses to `node->id`  and `node->next` cause cache misses. They are always on different lines due to the size of `data`. The struct is 64 bytes in total, which is 2 cache lines, and `id` is at the start, while `next` is at the end.
 
-*TODO does the string literal cause a cache miss probably yes*
-
-8. Move `next` and `prev` to the start of the struct. This yields 25 dcache misses down from 43. 
+8. Move `next` and `prev` to the start of the struct. This yields 25 dcache misses down from 43. This avoids the cache miss on line 31 because both `id` and `next` are in the same line.
 
 # Task 2
 9. The data cache misses come from accessing the `id` field of the struct at `items[i]`. Each iteration accesses a different line because the struct is 36 bytes long, while the cache line is 32 bytes.
-10. ??? cant change items_init so idk 
-
-*Store a pointer to the data instead of copying it. This reduces the size of the struct down to 8 bytes which should cut the number of misses roughly by a factor of 4.*
+10. If we use a data pointer, instead of storing the entire array, we can reduce the size of the struct from 36 bytes to just $4+8=12$ bytes. Doing this, we can fit 3 structs into a single cache line. To achieve this, we just allocate bytes when initializing the struct in _item\_init_. This data is therefore somewhere else in memory. 
 
 # Task 3
-11. Row-major and column-major refers to the ordering of a 2D array in memory. In row-major, the row given by the first index is contiguous in memory. In column-major the column given by the second index is contiguous. C uses row-major.
+11. Row-major and column-major refers to the ordering of a 2D array in memory. In row-major, the row given by the first index (using C double brackets e.g. `A[][]` syntax) is contiguous in memory. In column-major the column given by the second index is contiguous. C uses row-major.
 12. Primarily the accesses to out_vector and matrix. Because matrix is row-major each inner iteration loads a different cache line (size of row is 256 elements or 1024 bytes). `out_vector` may be similarly evicted frequently because the entire 1KiB of vector is stored to on every outer loop iteration.
-13. Reorder the loops so that `i` is on the outside and `j` inside.
+13. Reorder the loops so that `i` is on the outside and `j` inside. This switches things so that `in_vector` is now evicted frequently instead of `out_vector`, but `matrix` is accessed in a cache-friendlier order, so the overall 65893 to 8257.
 
 # Task 4
 14. It does not work because the writes to the LEDS are being cached. Normally, the I/O should be in an uncached region of memory but this is not the case here.
 15. 
 
-* Disable the caches entirely by commenting out the body of `init_dcache()`
+* Disable the caches entirely by commenting out the body of `init_dcache()`. Alternatively, use `dcache_flush` after every iteration to force the dcache to flush to the bus.
 
 * Disable write-back policy in `init_dcache()` and use write-through instead (remove `CACHE_WRITE_BACK` flag): 
 
