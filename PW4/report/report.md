@@ -1,7 +1,7 @@
 ---
 title: "CS476 - PW4 Report"
-author: Julien de Castelnau, Magnus Meyer
-date: November 11, 2024
+author: Julien de Castelnau (368509), Magnus Meyer (396302)
+date: November 12, 2024
 geometry: "a4paper, left=2cm,right=2cm,top=2cm,bottom=3cm"
 output: pdf_document
 ---
