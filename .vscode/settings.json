@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.bsv": "bluespec",
         "fractal_fxpt.h": "c",
         "fractal_myflpt.h": "c",
         "random": "c",
@@ -8,6 +9,9 @@
         "defs.h": "c",
         "stddef.h": "c",
         "cfg.h": "c",
-        "task2.h": "c"
+        "task2.h": "c",
+        "atomic": "c",
+        "condition_variable": "c",
+        "uart.h": "c"
     }
 }
