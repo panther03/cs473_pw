@@ -85,7 +85,7 @@ void* taskman_spawn(coro_fn_t coro_fn, void* arg, size_t stack_sz) {
         "out of space for task with stack size %d", stack_sz
     );
 
-    void* stack = (void*)&taskman.stack[taskman.stack_offset];
+    void* stack = (void*)(&taskman.stack[taskman.stack_offset]);
     coro_init(stack, stack_sz, coro_fn, arg);
     taskman.stack_offset += stack_sz;
 
@@ -109,16 +109,22 @@ void taskman_loop() {
     //        * the waiting handler says it can be resumed.
 
     while (!taskman.should_stop) {
+        TASKMAN_LOCK();
         for (int i = 0; i < taskman.handlers_count; i++) {
             taskman.handlers[i]->loop(taskman.handlers[i]);
         }
+        TASKMAN_RELEASE();
         for (int i = 0; i < taskman.tasks_count; i++) {
             struct coro_data* coro = (struct coro_data*) taskman.tasks[i];
             struct task_data* task = (struct task_data*) coro_data((void*)coro);
+            TASKMAN_LOCK();
             if (!task->running && !coro_completed(coro, NULL)
              && (!task->wait.handler || task->wait.handler->can_resume(task->wait.handler, coro, task->wait.arg))) {
+                task->running = 1;
+                TASKMAN_RELEASE();
                 coro_resume(coro);
             }
+            TASKMAN_RELEASE();
         }
     }
 }
@@ -141,13 +147,17 @@ void taskman_wait(struct taskman_handler* handler, void* arg) {
     void* stack = coro_stack();
     struct task_data* task_data = coro_data(stack);
 
+    TASKMAN_LOCK();
     if (handler && handler->on_wait(handler, stack, arg)) {
+        TASKMAN_RELEASE();
         // don't need to yield
         return;
     }
     task_data->running = 0;
     task_data->wait.handler = handler;
     task_data->wait.arg = arg;
+
+    TASKMAN_RELEASE();
     
     coro_yield();
 }
