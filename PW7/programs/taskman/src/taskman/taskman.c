@@ -85,6 +85,8 @@ void* taskman_spawn(coro_fn_t coro_fn, void* arg, size_t stack_sz) {
         "out of space for task with stack size %d", stack_sz
     );
 
+    TASKMAN_LOCK();
+
     void* stack = (void*)(&taskman.stack[taskman.stack_offset]);
     coro_init(stack, stack_sz, coro_fn, arg);
     taskman.stack_offset += stack_sz;
@@ -97,7 +99,8 @@ void* taskman_spawn(coro_fn_t coro_fn, void* arg, size_t stack_sz) {
     taskman.tasks[taskman.tasks_count] = stack;
     taskman.tasks_count++;
 
-    
+    TASKMAN_RELEASE();
+
     return stack;
 }
 
@@ -139,8 +142,10 @@ void taskman_register(struct taskman_handler* handler) {
     die_if_not(handler != NULL);
     die_if_not(taskman.handlers_count < TASKMAN_NUM_HANDLERS);
 
+    TASKMAN_LOCK();
     taskman.handlers[taskman.handlers_count] = handler;
     taskman.handlers_count++;
+    TASKMAN_RELEASE();
 }
 
 void taskman_wait(struct taskman_handler* handler, void* arg) {

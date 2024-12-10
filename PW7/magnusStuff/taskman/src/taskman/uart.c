@@ -118,7 +118,7 @@ static int can_resume(struct taskman_handler* handler, void* stack, void* arg) {
         }
 
         wait_data->buffer[wait_data->length++] = newChar;
-        if(wait_data->length == wait_data->buffer_capacity) {
+        if(wait_data->length == wait_data->buffer_capacity-1) {
             wait_data->buffer[wait_data->length] = '\0'; // Set end of line char
             uart_handler.stack = NULL;
             return 1; // Buffer is full

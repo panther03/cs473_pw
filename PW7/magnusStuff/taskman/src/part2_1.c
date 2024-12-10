@@ -69,7 +69,7 @@ static void entry_task() {
     // implement the functionality.
 
     // SECTION: basic test
-    #if 0
+    #if 1
     taskman_spawn(&periodic_task, (void*)1000, 4ull << 10);
     taskman_spawn(&periodic_task, (void*)3000, 4ull << 10);
     taskman_spawn(&periodic_task, (void*)9000, 4ull << 10);
@@ -81,7 +81,7 @@ static void entry_task() {
     #endif
 
     // SECTION: semaphore test
-    #if 0
+    #if 1
     taskman_semaphore_init(&s, 0, 3);
 
     taskman_spawn(&up_task, (void*)2000, 8ull << 10);

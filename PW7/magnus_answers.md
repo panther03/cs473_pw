@@ -46,3 +46,28 @@ Finally, it jumps to the function pointer of the coroutine to jump to, which sto
 
 ## Part 2.1:
 ### Question 6:
+Done
+
+### Question 7:
+The purpose of the flag is to specify, whether or not a coroutine is currently being executed. We see that this is initially set to "false" (0), but updated to "1" whenever the coroutine is resumed. This is useful in a multi-core implementation, as we do not want to execute the same coroutine in two cores at the same time. However, in a single core implementation, we know that when we are in the taskman\_loop function no coroutine is running. If they where running, then we would not be able to execute the taskman\_loop. Using this fact, we can simply remove the flag when simply treat it is always being set to "false" inside the taskman\_loop.
+
+### Question 8:
+Done
+
+### Question 9:
+Done
+
+## Part 2
+### Question 10:
+The lock works by having 256 distinct locks that each can be acquired by a CPU, based on the ID of each CPU. Each lock has a unique memory location. When a CPU wants to require a lock, it provides the ID for the lock (any value between 0-255) and busy-waits, until the value at the memory location of the lock is zero. It uses an _atomic_ compare and swap (CAS) operation to do this. When the value at the address equals zero, it will atomically swap this with the ID of the CPU that wants to require the lock. 
+When a CPU wants to release the lock, it simply sets the value of the lock to zero, allowing another CPU to acquire the lock if needed.
+
+### Question 11:
+For the Taskman implementation, we can identify 2 major race-conditions.
+Firstly, reading and updating task_data->running flag in a mutli core setting needs to be done inside a critical reading. Otherwise, two cores might run the taskman\_loop at the same time, both read that a coroutine is not running and both try and run the coroutine.
+
+Secondly, as mentioned in the project description, all handler functions need to be called from within a critical region. This is because the handlers are managed through a global struct that may be changed by calling these functions. 
+
+In both of these cases, they are relevant from within the taskman\_loop. One simple way to account for this, is to make everything within the loop a critical region, except for the instruction of _coro\_resume_, in which the loop switches to for coroutine for a CPU. However, it may be that two CPU's, both running the taskman loop, try and evaluate two different coroutines that each use two different handlers. In this case, the two loops should be able to run in parallel, as we don't risk overlapping critical regions. Even though this approach is more efficient, it also comes with greater complexity, as the CPUs need to somehow share which coroutine they are working on. When using TASKMAN\_LOCK(), we use a single lock across all CPUs. One way to make this implementation would be to give each task a unique lock and each handler a unique lock and acquire those instead of the taskman lock. 
+
+When we implement the TASKMAN\_LOCK() call before entering the taskman loop, while releasing before each _coro\_resume_, re-acquiering just after, we see that the print tasks are called continously and from alternating CPUs. This is the expected behavior, and indicate that the multi core implementation works.

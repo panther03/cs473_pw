@@ -18,9 +18,19 @@ static int impl(struct wait_data* wait_data) {
     // implement the semaphore logic here
     // do not forget to check the header file
     if(wait_data->waitForNotMax) {
-        return wait_data->sem->count != wait_data->sem->max;
-    } // Yes, I know this can be a one-liner, but this is way more readable
-    return wait_data->sem->count > 0;
+        if(wait_data->sem->count < wait_data->sem->max) {
+            wait_data->sem->count++;
+            return 1;
+        }
+        return 0;
+    } 
+
+    // Call of Sem.down() handled here
+    if(wait_data->sem->count > 0){
+        wait_data->sem->count--;
+        return 1;    
+    }
+    return 0;
 }
 
 static int on_wait(struct taskman_handler* handler, void* stack, void* arg) {
@@ -62,23 +72,17 @@ void taskman_semaphore_init(
 }
 
 void __no_optimize taskman_semaphore_down(struct taskman_semaphore* semaphore) {
-    if(semaphore->count == 0 ){
-        struct wait_data data = {
-            .sem = semaphore,
-            .waitForNotMax = 0,
-        };
-        taskman_wait(&semaphore_handler, (void*)(&data));
-    }
-    semaphore->count--;
+    struct wait_data data = {
+        .sem = semaphore,
+        .waitForNotMax = 0,
+    };
+    taskman_wait(&semaphore_handler, (void*)(&data));
 }
 
 void __no_optimize taskman_semaphore_up(struct taskman_semaphore* semaphore) {
-    if(semaphore->count == semaphore->max) {
-        struct wait_data data = {
-            .sem = semaphore,
-            .waitForNotMax = 1,
-        };
-        taskman_wait(&semaphore_handler, (void*)(&data));
-    }
-    semaphore->count++;
+    struct wait_data data = {
+        .sem = semaphore,
+        .waitForNotMax = 1,
+    };
+    taskman_wait(&semaphore_handler, (void*)(&data));
 }

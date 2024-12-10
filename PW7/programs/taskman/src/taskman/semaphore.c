@@ -10,18 +10,27 @@ struct wait_data {
     // to be passed as an argument.
     // what kind of data do we need to put here
     // so that the semaphore works correctly?
-    int is_increment;
     struct taskman_semaphore* sem;
+    char waitForNotMax; // Wait for not max OR wait for count not zero?
 };
 
 static int impl(struct wait_data* wait_data) {
     // implement the semaphore logic here
     // do not forget to check the header file
-    if (wait_data->is_increment) {
-        return wait_data->sem->count < wait_data->sem->max;
-    } else {
-        return wait_data->sem->count > 0;
+    if(wait_data->waitForNotMax) {
+        if(wait_data->sem->count < wait_data->sem->max) {
+            wait_data->sem->count++;
+            return 1;
+        }
+        return 0;
+    } 
+
+    // Call of Sem.down() handled here
+    if(wait_data->sem->count > 0){
+        wait_data->sem->count--;
+        return 1;    
     }
+    return 0;
 }
 
 static int on_wait(struct taskman_handler* handler, void* stack, void* arg) {
@@ -64,18 +73,16 @@ void taskman_semaphore_init(
 
 void __no_optimize taskman_semaphore_down(struct taskman_semaphore* semaphore) {
     struct wait_data data = {
-        .is_increment = 0,
-        .sem = semaphore
+        .sem = semaphore,
+        .waitForNotMax = 0,
     };
-    taskman_wait(&semaphore_handler, (void*)&data);
-    semaphore->count -= 1;
+    taskman_wait(&semaphore_handler, (void*)(&data));
 }
 
 void __no_optimize taskman_semaphore_up(struct taskman_semaphore* semaphore) {
     struct wait_data data = {
-        .is_increment = 1,
-        .sem = semaphore
+        .sem = semaphore,
+        .waitForNotMax = 1,
     };
-    taskman_wait(&semaphore_handler, (void*)&data);
-    semaphore->count += 1;
+    taskman_wait(&semaphore_handler, (void*)(&data));
 }

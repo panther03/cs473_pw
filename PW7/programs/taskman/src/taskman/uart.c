@@ -6,6 +6,7 @@
 #include <uart.h>
 
 #include <implement_me.h>
+#include <stdio.h>
 
 #define UART_BUFFER_CAPACITY 64
 
@@ -106,29 +107,22 @@ static int can_resume(struct taskman_handler* handler, void* stack, void* arg) {
     //
     // Note: that we need to put a '\0' at the end of the line.
     // Note: do not write the new line character
-    int can_resume = 0;
-    uint8_t* buf_cur = &wait_data->buffer[wait_data->length];
-    // need extra character for '\0'
-    uint8_t* buf_end = &wait_data->buffer[wait_data->buffer_capacity-1];
-    for (int i = 0; i < uart_buffer->size; i++) {
-        uint8_t c = uart_buffer_head(uart_buffer);
-        if (buf_cur >= buf_end) {
-            can_resume = 1;
-            break;
-        }
-        uart_buffer_pop(uart_buffer);
-        if (c == '\n') {
-            can_resume = 1; 
-            break;
-        }
-        *(buf_cur++) = c;
-    }
-    wait_data->length = buf_cur - wait_data->buffer;
 
-    if (can_resume) {
-        *buf_cur = '\0';
-        uart_handler.stack = NULL;
-        return 1;
+    while(uart_buffer_nonempty(uart_buffer)) {
+        char newChar = uart_buffer_pop(uart_buffer);
+
+        if(newChar == '\n') {
+            wait_data->buffer[wait_data->length] = '\0';
+            uart_handler.stack = NULL;
+            return 1; // Found a new line character    
+        }
+
+        wait_data->buffer[wait_data->length++] = newChar;
+        if(wait_data->length == wait_data->buffer_capacity-1) {
+            wait_data->buffer[wait_data->length] = '\0'; // Set end of line char
+            uart_handler.stack = NULL;
+            return 1; // Buffer is full
+        }
     }
 
     return 0;
@@ -143,10 +137,14 @@ static void loop(struct taskman_handler* handler) {
     // If available, read data from UART and put it to the UART buffer
     // You can discard data if the buffer is full.
     // see: support/src/uart.c for help.
-    while ((uart[UART_LINE_STATUS_REGISTER] & UART_RX_AVAILABLE_MASK) > 0) {
-        if (uart_buffer_full(uart_buffer)) continue;
-        uart_buffer_put(uart_buffer, *uart);
-    }
+
+    // From support/src/uart.c, we have found a keep to loop and get chars, if available
+    while(uart[UART_LINE_STATUS_REGISTER] & UART_RX_AVAILABLE_MASK) {
+        char readChar = uart_getc(uart);
+        if(uart_buffer->size < UART_BUFFER_CAPACITY) {
+            uart_buffer_put(uart_buffer, readChar);
+        }
+    } 
 }
 
 void taskman_uart_glinit() {

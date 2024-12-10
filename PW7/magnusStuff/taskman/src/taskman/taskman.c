@@ -77,6 +77,7 @@ void taskman_glinit() {
 }
 
 void* taskman_spawn(coro_fn_t coro_fn, void* arg, size_t stack_sz) {
+    TASKMAN_LOCK();
     // Preliminary Checks
     die_if_not(TASKMAN_STACK_SIZE > taskman.stack_offset + stack_sz);
     die_if_not(TASKMAN_NUM_TASKS  > taskman.tasks_count);
@@ -96,15 +97,13 @@ void* taskman_spawn(coro_fn_t coro_fn, void* arg, size_t stack_sz) {
         .running = 0,
     };
     
-    printf("Preparing to store coro_data\n");
     *(struct task_data*)coro_data(stack_loc) = new_task_data;
-    printf("Stored coro_data\n");
 
     // (3) register the coroutine in the tasks array
     taskman.tasks[taskman.tasks_count] = stack_loc;
     ++taskman.tasks_count;
-    printf("Registered task at location: %0.8x\n", stack_loc);
 
+    TASKMAN_RELEASE();
     return stack_loc;
 }
 
