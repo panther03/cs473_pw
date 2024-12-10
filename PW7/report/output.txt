@@ -1,0 +1,292 @@
+[13:56:54:179] Setting prog. mode␊
+[13:57:02:659] Download: done␊
+[13:57:06:115] Jumping to programm␊
+[13:57:06:115] <0x1b>Part 1: Coroutines␊
+[13:57:06:115] func = part1␊
+[13:57:06:115] func = test_fn, data = 0xaaaabeef␊
+[13:57:06:115] func = test_fn, i = 0, arg = 0xdeadbeef␊
+[13:57:06:131] func = part1␊
+[13:57:06:131] func = f, x = 15␊
+[13:57:06:131] func = part1␊
+[13:57:06:131] func = test_fn, f(15 + i) = 75␊
+[13:57:06:131] func = test_fn, i = 1, arg = 0xdeadbeef␊
+[13:57:06:131] func = part1␊
+[13:57:06:131] func = f, x = 16␊
+[13:57:06:131] func = part1␊
+[13:57:06:147] func = test_fn, f(15 + i) = 76␊
+[13:57:06:147] func = test_fn, i = 2, arg = 0xdeadbeef␊
+[13:57:06:147] func = part1␊
+[13:57:06:147] func = f, x = 17␊
+[13:57:06:147] func = part1␊
+[13:57:06:147] func = test_fn, f(15 + i) = 77␊
+[13:57:06:147] func = test_fn, i = 3, arg = 0xdeadbeef␊
+[13:57:06:163] func = part1␊
+[13:57:06:163] func = f, x = 18␊
+[13:57:06:163] func = part1␊
+[13:57:06:163] func = test_fn, f(15 + i) = 78␊
+[13:57:06:163] done.␊
+[13:57:06:163] result = 10␊
+[13:57:06:163] Part 2.1: Single-core Task Manager Implementation␊
+[13:57:06:179] now executing: part2_1␊
+[13:57:06:179] hello from the entry_task␊
+[13:57:06:179] [ t =          0 ms ] entry_task: waiting for all up_task's to finish␊
+[13:57:06:179] [ t =          0 ms ] periodic_task: period = 1000␊
+[13:57:06:195] [ t =          0 ms ] periodic_task: period = 3000␊
+[13:57:06:195] [ t =          0 ms ] periodic_task: period = 9000␊
+[13:57:06:195] [ t =         36 ms ] uart_task: received line with length = 0 (total = 0): ␊
+[13:57:06:883] [ t =       1001 ms ] periodic_task: period = 1000␊
+[13:57:07:251] [ t =       1509 ms ] uart_task: received line with length = 14 (total = 14): Hello World!\n␊
+[13:57:07:603] [ t =       2001 ms ] up_task: complete␊
+[13:57:07:603] [ t =       2007 ms ] entry_task: done 1␊
+[13:57:07:603] [ t =       2007 ms ] periodic_task: period = 1000␊
+[13:57:08:307] [ t =       3001 ms ] periodic_task: period = 3000␊
+[13:57:08:307] [ t =       3001 ms ] up_task: complete␊
+[13:57:08:323] [ t =       3014 ms ] entry_task: done 2␊
+[13:57:08:323] [ t =       3014 ms ] periodic_task: period = 1000␊
+[13:57:09:011] [ t =       4001 ms ] up_task: complete␊
+[13:57:09:027] [ t =       4007 ms ] entry_task: done 3␊
+[13:57:09:027] [ t =       4007 ms ] entry_task: all up_task's are complete␊
+[13:57:09:027] [ t =       4007 ms ] entry_task: blocking all up_task's for 2 seconds␊
+[13:57:09:043] [ t =       4033 ms ] periodic_task: period = 1000␊
+[13:57:09:747] [ t =       5034 ms ] periodic_task: period = 1000␊
+[13:57:10:435] [ t =       6002 ms ] periodic_task: period = 3000␊
+[13:57:10:451] [ t =       6010 ms ] up_task: complete␊
+[13:57:10:451] [ t =       6010 ms ] up_task: complete␊
+[13:57:10:451] [ t =       6010 ms ] up_task: complete␊
+[13:57:10:467] [ t =       6035 ms ] periodic_task: period = 1000␊
+[13:57:11:155] [ t =       7011 ms ] entry_task: stopping the task manager loop␊
+[13:57:11:155] Part 2.2: Dual-core Task Manager Implementation␊
+[13:57:11:175] CPU with id 1 is working!␊
+[13:57:11:175] CPU with id 2 is working!␊
+[13:57:11:175] print_task: arg = task1, cpu id = 1␊
+[13:57:11:175] print_task: arg = task2, cpu id = 2␊
+[13:57:11:283] print_task: arg = task3, cpu id = 1␊
+[13:57:11:283] print_task: arg = task4, cpu id = 2␊
+[13:57:11:379] bouncing_ball_task␊
+[13:57:11:379] print_task: arg = task1, cpu id = 2␊
+[13:57:11:475] print_task: arg = task2, cpu id = 1␊
+[13:57:11:491] print_task: arg = task3, cpu id = 2␊
+[13:57:11:587] print_task: arg = task4, cpu id = 1␊
+[13:57:11:683] print_task: arg = task1, cpu id = 1␊
+[13:57:11:699] print_task: arg = task2, cpu id = 2␊
+[13:57:11:795] print_task: arg = task3, cpu id = 1␊
+[13:57:11:795] print_task: arg = task4, cpu id = 2␊
+[13:57:11:907] print_task: arg = task1, cpu id = 2␊
+[13:57:12:003] print_task: arg = task2, cpu id = 1␊
+[13:57:12:003] print_task: arg = task3, cpu id = 2␊
+[13:57:12:099] print_task: arg = task4, cpu id = 1␊
+[13:57:12:211] print_task: arg = task1, cpu id = 1␊
+[13:57:12:211] print_task: arg = task2, cpu id = 2␊
+[13:57:12:307] print_task: arg = task3, cpu id = 1␊
+[13:57:12:307] print_task: arg = task4, cpu id = 2␊
+[13:57:12:419] print_task: arg = task1, cpu id = 2␊
+[13:57:12:515] print_task: arg = task2, cpu id = 1␊
+[13:57:12:515] print_task: arg = task3, cpu id = 2␊
+[13:57:12:611] print_task: arg = task4, cpu id = 1␊
+[13:57:12:723] print_task: arg = task1, cpu id = 1␊
+[13:57:12:723] print_task: arg = task2, cpu id = 2␊
+[13:57:12:818] print_task: arg = task3, cpu id = 1␊
+[13:57:12:818] print_task: arg = task4, cpu id = 2␊
+[13:57:12:930] print_task: arg = task1, cpu id = 2␊
+[13:57:13:027] print_task: arg = task2, cpu id = 1␊
+[13:57:13:027] print_task: arg = task3, cpu id = 2␊
+[13:57:13:123] print_task: arg = task4, cpu id = 1␊
+[13:57:13:235] print_task: arg = task1, cpu id = 1␊
+[13:57:13:235] print_task: arg = task2, cpu id = 2␊
+[13:57:13:331] print_task: arg = task3, cpu id = 1␊
+[13:57:13:347] print_task: arg = task4, cpu id = 2␊
+[13:57:13:443] print_task: arg = task1, cpu id = 2␊
+[13:57:13:539] print_task: arg = task2, cpu id = 1␊
+[13:57:13:555] print_task: arg = task3, cpu id = 2␊
+[13:57:13:651] print_task: arg = task4, cpu id = 1␊
+[13:57:13:747] print_task: arg = task1, cpu id = 1␊
+[13:57:13:747] print_task: arg = task2, cpu id = 2␊
+[13:57:13:859] print_task: arg = task3, cpu id = 1␊
+[13:57:13:859] print_task: arg = task4, cpu id = 2␊
+[13:57:13:955] print_task: arg = task1, cpu id = 2␊
+[13:57:14:051] print_task: arg = task2, cpu id = 1␊
+[13:57:14:067] print_task: arg = task3, cpu id = 2␊
+[13:57:14:163] print_task: arg = task4, cpu id = 1␊
+[13:57:14:259] print_task: arg = task1, cpu id = 1␊
+[13:57:14:274] print_task: arg = task2, cpu id = 2␊
+[13:57:14:371] print_task: arg = task3, cpu id = 1␊
+[13:57:14:371] print_task: arg = task4, cpu id = 2␊
+[13:57:14:483] print_task: arg = task1, cpu id = 2␊
+[13:57:14:579] print_task: arg = task2, cpu id = 1␊
+[13:57:14:579] print_task: arg = task3, cpu id = 2␊
+[13:57:14:675] print_task: arg = task4, cpu id = 1␊
+[13:57:14:787] print_task: arg = task1, cpu id = 1␊
+[13:57:14:787] print_task: arg = task2, cpu id = 2␊
+[13:57:14:883] print_task: arg = task3, cpu id = 1␊
+[13:57:14:883] print_task: arg = task4, cpu id = 2␊
+[13:57:14:995] print_task: arg = task1, cpu id = 2␊
+[13:57:15:091] print_task: arg = task2, cpu id = 1␊
+[13:57:15:091] print_task: arg = task3, cpu id = 2␊
+[13:57:15:187] print_task: arg = task4, cpu id = 1␊
+[13:57:15:299] print_task: arg = task1, cpu id = 1␊
+[13:57:15:299] print_task: arg = task2, cpu id = 2␊
+[13:57:15:395] print_task: arg = task3, cpu id = 1␊
+[13:57:15:395] print_task: arg = task4, cpu id = 2␊
+[13:57:15:507] print_task: arg = task1, cpu id = 2␊
+[13:57:15:602] print_task: arg = task2, cpu id = 1␊
+[13:57:15:602] print_task: arg = task3, cpu id = 2␊
+[13:57:15:698] print_task: arg = task4, cpu id = 1␊
+[13:57:15:810] print_task: arg = task1, cpu id = 1␊
+[13:57:15:810] print_task: arg = task2, cpu id = 2␊
+[13:57:15:906] print_task: arg = task3, cpu id = 1␊
+[13:57:15:923] print_task: arg = task4, cpu id = 2␊
+[13:57:16:019] print_task: arg = task1, cpu id = 2␊
+[13:57:16:115] print_task: arg = task2, cpu id = 1␊
+[13:57:16:131] print_task: arg = task3, cpu id = 2␊
+[13:57:16:227] print_task: arg = task4, cpu id = 1␊
+[13:57:16:326] print_task: arg = task1, cpu id = 1␊
+[13:57:16:326] print_task: arg = task2, cpu id = 2␊
+[13:57:16:435] print_task: arg = task3, cpu id = 1␊
+[13:57:16:435] print_task: arg = task4, cpu id = 2␊
+[13:57:16:531] print_task: arg = task1, cpu id = 2␊
+[13:57:16:627] print_task: arg = task2, cpu id = 1␊
+[13:57:16:643] print_task: arg = task3, cpu id = 2␊
+[13:57:16:739] print_task: arg = task4, cpu id = 1␊
+[13:57:16:834] print_task: arg = task1, cpu id = 1␊
+[13:57:16:834] print_task: arg = task2, cpu id = 2␊
+[13:57:16:947] print_task: arg = task3, cpu id = 1␊
+[13:57:16:947] print_task: arg = task4, cpu id = 2␊
+[13:57:17:043] print_task: arg = task1, cpu id = 2␊
+[13:57:17:139] print_task: arg = task2, cpu id = 1␊
+[13:57:17:155] print_task: arg = task3, cpu id = 2␊
+[13:57:17:251] print_task: arg = task4, cpu id = 1␊
+[13:57:17:347] print_task: arg = task1, cpu id = 1␊
+[13:57:17:363] print_task: arg = task2, cpu id = 2␊
+[13:57:17:459] print_task: arg = task3, cpu id = 1␊
+[13:57:17:459] print_task: arg = task4, cpu id = 2␊
+[13:57:17:571] print_task: arg = task1, cpu id = 2␊
+[13:57:17:667] print_task: arg = task2, cpu id = 1␊
+[13:57:17:667] print_task: arg = task3, cpu id = 2␊
+[13:57:17:763] print_task: arg = task4, cpu id = 1␊
+[13:57:17:874] print_task: arg = task1, cpu id = 1␊
+[13:57:17:874] print_task: arg = task2, cpu id = 2␊
+[13:57:17:971] print_task: arg = task3, cpu id = 1␊
+[13:57:17:971] print_task: arg = task4, cpu id = 2␊
+[13:57:18:083] print_task: arg = task1, cpu id = 2␊
+[13:57:18:179] print_task: arg = task2, cpu id = 1␊
+[13:57:18:179] print_task: arg = task3, cpu id = 2␊
+[13:57:18:274] print_task: arg = task4, cpu id = 1␊
+[13:57:18:387] print_task: arg = task1, cpu id = 1␊
+[13:57:18:387] print_task: arg = task2, cpu id = 2␊
+[13:57:18:483] print_task: arg = task3, cpu id = 1␊
+[13:57:18:483] print_task: arg = task4, cpu id = 2␊
+[13:57:18:594] print_task: arg = task1, cpu id = 2␊
+[13:57:18:691] print_task: arg = task2, cpu id = 1␊
+[13:57:18:691] print_task: arg = task3, cpu id = 2␊
+[13:57:18:787] print_task: arg = task4, cpu id = 1␊
+[13:57:18:905] print_task: arg = task1, cpu id = 1␊
+[13:57:18:905] print_task: arg = task2, cpu id = 2␊
+[13:57:18:995] print_task: arg = task3, cpu id = 1␊
+[13:57:19:010] print_task: arg = task4, cpu id = 2␊
+[13:57:19:107] print_task: arg = task1, cpu id = 2␊
+[13:57:19:203] print_task: arg = task2, cpu id = 1␊
+[13:57:19:219] print_task: arg = task3, cpu id = 2␊
+[13:57:19:314] print_task: arg = task4, cpu id = 1␊
+[13:57:19:410] print_task: arg = task1, cpu id = 1␊
+[13:57:19:410] print_task: arg = task2, cpu id = 2␊
+[13:57:19:522] print_task: arg = task3, cpu id = 1␊
+[13:57:19:522] print_task: arg = task4, cpu id = 2␊
+[13:57:19:618] print_task: arg = task1, cpu id = 2␊
+[13:57:19:714] print_task: arg = task2, cpu id = 1␊
+[13:57:19:730] print_task: arg = task3, cpu id = 2␊
+[13:57:19:826] print_task: arg = task4, cpu id = 1␊
+[13:57:19:922] print_task: arg = task1, cpu id = 1␊
+[13:57:19:938] print_task: arg = task2, cpu id = 2␊
+[13:57:20:035] print_task: arg = task3, cpu id = 1␊
+[13:57:20:035] print_task: arg = task4, cpu id = 2␊
+[13:57:20:147] print_task: arg = task1, cpu id = 2␊
+[13:57:20:273] print_task: arg = task2, cpu id = 1␊
+[13:57:20:273] print_task: arg = task3, cpu id = 2␊
+[13:57:20:361] print_task: arg = task4, cpu id = 1␊
+[13:57:20:476] print_task: arg = task1, cpu id = 1␊
+[13:57:20:476] print_task: arg = task2, cpu id = 2␊
+[13:57:20:563] print_task: arg = task3, cpu id = 1␊
+[13:57:20:563] print_task: arg = task4, cpu id = 2␊
+[13:57:20:658] print_task: arg = task1, cpu id = 2␊
+[13:57:20:754] print_task: arg = task2, cpu id = 1␊
+[13:57:20:754] print_task: arg = task3, cpu id = 2␊
+[13:57:20:850] print_task: arg = task4, cpu id = 1␊
+[13:57:20:962] print_task: arg = task1, cpu id = 1␊
+[13:57:20:962] print_task: arg = task2, cpu id = 2␊
+[13:57:21:058] print_task: arg = task3, cpu id = 1␊
+[13:57:21:058] print_task: arg = task4, cpu id = 2␊
+[13:57:21:170] print_task: arg = task1, cpu id = 2␊
+[13:57:21:267] print_task: arg = task2, cpu id = 1␊
+[13:57:21:267] print_task: arg = task3, cpu id = 2␊
+[13:57:21:362] print_task: arg = task4, cpu id = 1␊
+[13:57:21:474] print_task: arg = task1, cpu id = 1␊
+[13:57:21:474] print_task: arg = task2, cpu id = 2␊
+[13:57:21:570] print_task: arg = task3, cpu id = 1␊
+[13:57:21:586] print_task: arg = task4, cpu id = 2␊
+[13:57:21:683] print_task: arg = task1, cpu id = 2␊
+[13:57:21:778] print_task: arg = task2, cpu id = 1␊
+[13:57:21:794] print_task: arg = task3, cpu id = 2␊
+[13:57:21:890] print_task: arg = task4, cpu id = 1␊
+[13:57:21:987] print_task: arg = task1, cpu id = 1␊
+[13:57:21:987] print_task: arg = task2, cpu id = 2␊
+[13:57:22:113] print_task: arg = task3, cpu id = 1␊
+[13:57:22:113] print_task: arg = task4, cpu id = 2␊
+[13:57:22:194] print_task: arg = task1, cpu id = 2␊
+[13:57:22:292] print_task: arg = task2, cpu id = 1␊
+[13:57:22:306] print_task: arg = task3, cpu id = 2␊
+[13:57:22:412] print_task: arg = task4, cpu id = 1␊
+[13:57:22:498] print_task: arg = task1, cpu id = 1␊
+[13:57:22:498] print_task: arg = task2, cpu id = 2␊
+[13:57:22:610] print_task: arg = task3, cpu id = 1␊
+[13:57:22:610] print_task: arg = task4, cpu id = 2␊
+[13:57:22:707] print_task: arg = task1, cpu id = 2␊
+[13:57:22:802] print_task: arg = task2, cpu id = 1␊
+[13:57:22:818] print_task: arg = task3, cpu id = 2␊
+[13:57:22:915] print_task: arg = task4, cpu id = 1␊
+[13:57:23:011] print_task: arg = task1, cpu id = 1␊
+[13:57:23:026] print_task: arg = task2, cpu id = 2␊
+[13:57:23:124] print_task: arg = task3, cpu id = 1␊
+[13:57:23:124] print_task: arg = task4, cpu id = 2␊
+[13:57:23:235] print_task: arg = task1, cpu id = 2␊
+[13:57:23:330] print_task: arg = task2, cpu id = 1␊
+[13:57:23:330] print_task: arg = task3, cpu id = 2␊
+[13:57:23:427] print_task: arg = task4, cpu id = 1␊
+[13:57:23:539] print_task: arg = task1, cpu id = 1␊
+[13:57:23:539] print_task: arg = task2, cpu id = 2␊
+[13:57:23:634] print_task: arg = task3, cpu id = 1␊
+[13:57:23:634] print_task: arg = task4, cpu id = 2␊
+[13:57:23:746] print_task: arg = task1, cpu id = 2␊
+[13:57:23:842] print_task: arg = task2, cpu id = 1␊
+[13:57:23:842] print_task: arg = task3, cpu id = 2␊
+[13:57:23:938] print_task: arg = task4, cpu id = 1␊
+[13:57:24:050] print_task: arg = task1, cpu id = 1␊
+[13:57:24:050] print_task: arg = task2, cpu id = 2␊
+[13:57:24:146] print_task: arg = task3, cpu id = 1␊
+[13:57:24:146] print_task: arg = task4, cpu id = 2␊
+[13:57:24:258] print_task: arg = task1, cpu id = 2␊
+[13:57:24:355] print_task: arg = task2, cpu id = 1␊
+[13:57:24:355] print_task: arg = task3, cpu id = 2␊
+[13:57:24:450] print_task: arg = task4, cpu id = 1␊
+[13:57:24:562] print_task: arg = task1, cpu id = 1␊
+[13:57:24:562] print_task: arg = task2, cpu id = 2␊
+[13:57:24:770] CS-473 System programming for systems on chip␊
+[13:57:24:770] Openrisc based virtual Prototype.␊
+[13:57:24:786] Build version: Tue Nov 12 02:20:53 PM CET 2024␊
+[13:57:24:786] ␊
+[13:57:24:786] I am CPU 1 of 2 running at 59.40 MHz.␊
+[13:57:24:786] ␊
+[13:57:24:802] Known RS232 commands:␊
+[13:57:24:802] $  Start the program loaded in target␊
+[13:57:24:802] *p Set programming mode (default)␊
+[13:57:24:802] *v Set verification mode␊
+[13:57:24:818] *i Show info on program in target␊
+[13:57:24:818] *t Toggle target between SDRam (default), soft-Bios and Flash␊
+[13:57:24:818] *m Perform simple SDRam memcheck␊
+[13:57:24:818] *s Check SPI-flash chip␊
+[13:57:24:818] *e Erase SPI-Flash chip␊
+[13:57:24:818] *f Store program loaded in SDRAM to SPI-Flash␊
+[13:57:24:834] *c Compare program loaded in SDRAM with SPI-Flash␊
+[13:57:24:834] *r Run program stored in SPI-Flash␊
+[13:57:24:834] *q Toggle stack pointer from SDRAM (default) with SPM␊
+[13:57:24:834] *h This helpscreen␊
+[13:57:24:850] ␊
